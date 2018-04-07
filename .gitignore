@@ -1,0 +1,14 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Example Videos
+videos/comerciales/*
+videos/television/*
+
+# Temp Files
+temp/*
+temp/
+
+.vscode
