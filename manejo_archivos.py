@@ -36,5 +36,3 @@ def cargar_descriptores_comerciales(ruta):
     """
     return [(basename(vector_caracteristicas).split('.')[0], cargar_descriptor(vector_caracteristicas)) 
             for vector_caracteristicas in listar_archivos_en_carpeta(ruta)]
-
-    # return list(map(lambda abs_path: (basename(abs_path).split('.')[0], cargar_descriptor(abs_path)), listar_archivos_en_carpeta(ruta)))

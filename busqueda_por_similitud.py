@@ -87,37 +87,32 @@ def calcular_frames_minima_distancia(
     return (frame_minima_distancia[0], frame_minima_distancia[1])
 
 
-def busqueda_por_similitud(vector_descriptor_video_tv, vectores_descriptores_comerciales, debug=False):
+def similarity_search(analyzed_video_descriptors_vector, comparate_videos_descriptors, debug=False):
 
-    # vector_descriptor_video_tv[0] -> Tiempo desde el inicio del frame
-    # vector_descriptor_video_tv[1] -> Vector caracteristico del frame
+    # analyzed_video_descriptors_vector[0] -> Timestamp from the begining of the video
+    # analyzed_video_descriptors_vector[1] -> Calculated caracteristic vector of the frame
     tiempo_inicial = time.time()
-    print(len(vector_descriptor_video_tv))
+    print("Detected frames:", len(analyzed_video_descriptors_vector))
 
-    proporcion_aviso = round(len(vector_descriptor_video_tv) /
-                             10) if round(len(vector_descriptor_video_tv)/10) != 0 else 1
+    proporcion_aviso = round(len(analyzed_video_descriptors_vector) /
+                             10) if round(len(analyzed_video_descriptors_vector)/10) != 0 else 1
 
-    ranking_acumulado_por_descriptor = []
+    similarity_search_results = []
 
-    for descriptor in enumerate(vector_descriptor_video_tv):
+    for descriptor in enumerate(analyzed_video_descriptors_vector):
         # descriptor[0] -> Numero del frame al que se le esta calculando el ranking
         # descriptor[1] -> Objeto con el vector caracteristico + tiempo transcurrido al que se le calculara el frame del comericial con menor distancia.
+        calculated_min_dist_frame = calcular_frames_minima_distancia(descriptor[1]["vector_caracteristico"], comparate_videos_descriptors, distancia_euclideana, False)
 
-        ranking_calculado = {
-            'num_frame': descriptor[0],
-            'tiempo_transcurrido' : descriptor[1]["tiempo_transcurrido"],
-            # TODO ELEGIR ENTRE ESTO O EL SIGUIENTE
-            # 'ranking_min_dist' : ranking_primeros_n(descriptor[1], vectores_descriptores_comerciales, 5, distancia_manhattan, False)
-            'frame_min_distancia': calcular_frames_minima_distancia(descriptor[1]["vector_caracteristico"], vectores_descriptores_comerciales, distancia_euclideana, False)
-        }
-        ranking_acumulado_por_descriptor.append(ranking_calculado)
+        # result_tuple = ('analyzed_video_frame_number','elapsed_time', 'other_vid_name', 'min_dist_frame')
+        similarity_search_results.append((descriptor[0], descriptor[1]["tiempo_transcurrido"], calculated_min_dist_frame[0], calculated_min_dist_frame[1]))
 
         if ((descriptor[0] + 1) % proporcion_aviso) == 0:
             
-            print("Procesando distancias comerciales frame",
+            print("Getting min frames distances for the frame",
                   (descriptor[0] + 1),
                   "/",
-                  len(vector_descriptor_video_tv),
+                  len(analyzed_video_descriptors_vector),
                   "\t Tiempo tomado:",
                   diferencia_tiempos(tiempo_inicial, time.time()))
             if (debug):
@@ -126,17 +121,17 @@ def busqueda_por_similitud(vector_descriptor_video_tv, vectores_descriptores_com
                 if (cmd == 'm'):
                     import pprint
                     pp = pprint.PrettyPrinter(indent=4)
-                    pp.pprint(ranking_acumulado_por_descriptor)
+                    pp.pprint(similarity_search_results)
                 elif (cmd == 'l'):
                     import pprint
                     pp = pprint.PrettyPrinter(indent=4)
-                    pprint.pprint(ranking_acumulado_por_descriptor, open('log.txt', 'w'))
+                    pprint.pprint(similarity_search_results, open('log.txt', 'w'))
                 elif (cmd == 'q'):
                     exit()
                 elif(cmd == 'd'):
                     debug = False
 
-    return np.array(ranking_acumulado_por_descriptor)
+    return np.array(similarity_search_results)
 
 # DEBUG
 # RUTA_COMERCIALES = "temp/comerciales/"

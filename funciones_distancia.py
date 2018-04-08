@@ -18,9 +18,5 @@ def ditancia_hamming(u,v):
 def distancia_euclideana(u,v):
     return np.linalg.norm(u-v)
 
-# def distancia_xi_square(X,Y):
-#     return(cv2.compareHist(np.array(X, dtype=np.float32),np.array(Y, dtype=np.float32),cv2.HISTCMP_CHISQR))
-
-
 
 
