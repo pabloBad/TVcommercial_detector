@@ -1,6 +1,7 @@
 import numpy as np
-from os import listdir
-from os.path import isfile, join, abspath, exists, basename
+from os import listdir, makedirs
+from os.path import isfile, join, abspath, exists, basename, dirname
+import cv2
 
 # ------------------------------------------------------------------------------------------------
 # ----------------------------------- Manipulacion de Archivos -----------------------------------
@@ -36,3 +37,36 @@ def cargar_descriptores_comerciales(ruta):
     """
     return [(basename(vector_caracteristicas).split('.')[0], cargar_descriptor(vector_caracteristicas)) 
             for vector_caracteristicas in listar_archivos_en_carpeta(ruta)]
+
+
+def open_video(path):
+    """Abre un video utilizando un objeto cv2. Retorna una tupla con el objeto con el video, la cantidad de frames y de fps.
+
+    Arguments:
+        path {String} -- Ruta al archivo.
+
+    Raises:
+        Exception -- Archivo no existe.
+
+    Returns:
+        (cv2.VideoCapture, total_frames, fps_video) -- Tupla contenedora de: objeto lector del video, total de frames del video y fps promedio del video.
+    """
+
+    if (not isfile(path)):
+        raise Exception("Archivo no encontrado: " + path)
+    return cv2.VideoCapture(path)
+
+
+def save_feature_vector_array(video_path, feature_vector_array):
+    """Guarda el descriptor calculado binarizandolo (con numpy) en la ruta temp/ + tipo_video/ + video.npy
+
+    Arguments:
+        ruta_video {String} -- Ruta completa hacia el video
+        feature_vector_array {ndarray} -- Arreglo de vectores carcteristicos que sera guardado en la ruta
+    """
+
+    if not exists("temp/" + basename(dirname(video_path))):
+        makedirs("temp/" + basename(dirname(video_path)))
+
+    np.save("temp/" + basename(dirname(video_path)) + '/' + basename(video_path).split(".")
+            [0] + ".npy", feature_vector_array)

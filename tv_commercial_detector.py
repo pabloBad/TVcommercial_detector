@@ -2,26 +2,50 @@ from os import listdir, makedirs
 from os.path import isfile, join, exists, abspath, basename
 import numpy as np
 
-from manejo_archivos import listar_archivos_en_carpeta, cargar_descriptores_comerciales, cargar_descriptor
-from extractor_caracteristicas import extarer_caracteristicas
-from busqueda_por_similitud import similarity_search
-from apparition_detector import apparition_detector
+from file_functions import listar_archivos_en_carpeta, cargar_descriptores_comerciales, cargar_descriptor
+
+from feature_extractor import extract_video_feature
+from similarity_search import similarity_search
+from occurence_detector import occurence_detector
 
 
-def execute_feature_extraction(ruta_television, ruta_comerciales, debug=False):
+def execute_feature_extraction(
+    videos_to_analyze_path, other_videos_path, 
+    rows_of_division=8, 
+    cols_of_division=8, 
+    bins=16, 
+    fps_target=3, 
+    debug=False):
 
-    videos_comerciales = listar_archivos_en_carpeta(ruta_comerciales)
-    videos_television = listar_archivos_en_carpeta(ruta_television)
+    other_videos_list = listar_archivos_en_carpeta(other_videos_path)
+    videos_to_analyze_list = listar_archivos_en_carpeta(videos_to_analyze_path)
 
     if not exists("temp/"):
         makedirs("temp/")
 
-    print("Extrayendo caracteristicas de comerciales:\n")
-    list(map(extarer_caracteristicas, videos_comerciales))
+    print("Feature Extraction of files in:", other_videos_path, "\n")
+    features_array_other_videos = [extract_video_feature(
+                                                        other_video,   
+                                                        rows_of_division, 
+                                                        cols_of_division, 
+                                                        bins,  
+                                                        fps_target, 
+                                                        debug=debug) 
+                                    for other_video in other_videos_list]
 
-    print("Extrayendo caracteristicas de las grabaciones de tv:\n")
-    list(map(extarer_caracteristicas, videos_television))
+    # print("Feature Extraction of files in:", ruta_television, "\n")
+    # list(map(extract_video_feature, videos_television))
 
+    features_array_videos_to_analyze = [extract_video_feature(
+                                                    video_to_analyze,   
+                                                    rows_of_division, 
+                                                    cols_of_division, 
+                                                    bins,  
+                                                    fps_target, 
+                                                    debug=debug) 
+                                for video_to_analyze in videos_to_analyze_list]
+
+    return (features_array_videos_to_analyze, features_array_other_videos)
 
 def execute_similarity_search_one_video(analyzed_video_name, analyzed_video_descriptors, comparate_videos_descriptors, debug=False):
     return {'analyzed_video_name': analyzed_video_name,
@@ -35,29 +59,42 @@ def execute_similarity_search(analyzed_videos_path, comparated_videos_path, debu
     similarity_search_results_by_video = []
 
     for analyzed_video_descriptors_file in listar_archivos_en_carpeta(analyzed_videos_path):
-        print("Procesando el vector descriptor del video",
+        print("Processing array of feature vectors for",
               basename(analyzed_video_descriptors_file))
         similarity_search_results_by_video.append(
             execute_similarity_search_one_video(basename(analyzed_video_descriptors_file), cargar_descriptor(analyzed_video_descriptors_file), comparated_videos_descriptors_vectors, debug=debug))
 
-        # TODO eliminar esta linea de codigo.....
-        if (True):
-            break
     return np.array(similarity_search_results_by_video)
 
 
-def execute_apparition_detector_one_video(similarity_search_result_tuple):
+def execute_occurence_detector_one_video(similarity_search_result_tuple):
     # window size = 120 -> aprox 40 seconds of window
-    return apparition_detector(similarity_search_result_tuple, 120, 20, 0.4, 30)
+    return occurence_detector(similarity_search_result_tuple, 200, 30, 0.4, 60)
 
 
-
-def execute_apparition_detector(similarity_search_results_by_video):
+def execute_occurence_detector(similarity_search_results_by_video):
+    occurrences_detected_all_videos = []
     for similarity_search_result in similarity_search_results_by_video:
         # similarity_search_result = {'analyzed_video_name','similarity_search'}
         # similarity_search_result_tuple = ('analyzed_video_frame','elapsed_time', 'other_vid_name', 'min_dist_frame')
-        execute_apparition_detector_one_video(
-            similarity_search_result['similarity_search_result_tuple'])
+        occurrences_detected_all_videos.append((similarity_search_result['analyzed_video_name'], execute_occurence_detector_one_video(
+            similarity_search_result['similarity_search_result_tuple'])))
+
+    # occurence (analyzed_video_name, (other_video_name, other_video_start_time, other_video_length))
+    print(occurrences_detected_all_videos)
+
+    results = []
+    for video_analyzed in occurrences_detected_all_videos:
+        for occurrences_array in video_analyzed[1]:
+            results.append(
+                (video_analyzed[0], occurrences_array[1], occurrences_array[2], occurrences_array[0]))
+    print("\n\n")
+    return results
+
+
+def print_results(results):
+    for result in results:
+        print(result[0], '\t', result[1], '\t', result[2], '\t', result[3])
     return
 
 
@@ -65,8 +102,8 @@ def main():
     RUTA_COMERCIALES = "videos/comerciales/"
     RUTA_TELEVISION = "videos/television/"
 
-    RUTA_TEMPORAL_COMERCIALES = "temp/comerciales"
     analyzed_videos_path = "temp/television"
+    other_video_path = "temp/comerciales"
 
     DEBUG = False
 
@@ -74,18 +111,20 @@ def main():
     # de cada uno de ellos para posteriormente guarlos:
 
     # TODO SACAR ESTE COMENTARIO....
-    # execute_feature_extraction(RUTA_TELEVISION, RUTA_COMERCIALES, DEBUG)
+    # execute_feature_extraction(RUTA_TELEVISION, RUTA_COMERCIALES, debug=DEBUG)
 
     # Paso 2: Hacemos la busqueda por similitud mediante el calculo de un ranking de
     # frames similares entre un frame del video de television y todos los frames de
     # todos los comerciales, usando funciones de distancia de caracteristicas.
     # results = execute_similarity_search(
-    #     analyzed_videos_path, RUTA_TEMPORAL_COMERCIALES, False)
+    # similarity_search_results_by_video = execute_similarity_search(analyzed_videos_path, other_video_path, True)
 
-    # np.save("temp/test_1.npy", results)
+    # np.save("temp/test_1.npy", similarity_search_results_by_video)
     # Paso 3: Ejecutamos la deteccion de apariciones...
 
-    execute_apparition_detector(np.load('temp/test_1.npy'))
+    # print (execute_apparition_detector(similarity_search_results_by_video))
+
+    print_results(execute_occurence_detector(np.load('temp/test_1.npy')))
 
 
 main()

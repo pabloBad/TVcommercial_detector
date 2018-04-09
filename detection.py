@@ -21,10 +21,10 @@ class detection:
 
     def get_detection_seconds(self, round_time = True):
         if round_time:
-            return self.detected_video_name, round(self.init_time / 1000), round(self.end_time/1000)
+            return self.detected_video_name, round(self.init_time / 1000, 1), round(self.end_time/1000, 1)
         return self.detected_video_name, self.init_time / 1000, self.end_time/1000
 
     def get_init_time_and_length(self, round_time = True):
         if round_time:
-            return self.detected_video_name, round(self.init_time / 1000), round((self.end_time - self.init_time)/1000)
+            return self.detected_video_name, round(self.init_time / 1000, 1), round((self.end_time - self.init_time)/1000, 1)
         return self.detected_video_name, self.init_time / 1000, (self.end_time - self.init_time)/1000

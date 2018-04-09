@@ -36,7 +36,13 @@ def extract_time_from_detected_sequence(detected_sequence):
     return (detected_sequence[min_idx][0], detected_sequence[-1][0])
 
 
-def apparition_detector(similarity_search_results, window_size, min_amount_sequence_numbers, min_percentage_sequence_numbers, skip_frames, debug=True):
+def occurence_detector(
+    similarity_search_results, 
+    window_size, 
+    min_amount_sequence_numbers, 
+    min_percentage_sequence_numbers, 
+    skip_frames, 
+    debug=True):
     # similarity_search_results: Array of tuples
     # result_tuple = ('analyzed_video_frame','elapsed_time', 'other_vid_name', 'min_dist_frame')
     #         (3172, 952584.9666666667, 'scotiabank', 8),
@@ -94,7 +100,4 @@ def apparition_detector(similarity_search_results, window_size, min_amount_seque
                         if not is_in_detections:
                             detections.append(detection(other_vid_name, init_time, end_time))
 
-    for d in detections:
-        print(d.get_init_time_and_length())
-
-    return detections
+    return [detection_instance.get_init_time_and_length() for detection_instance in detections]

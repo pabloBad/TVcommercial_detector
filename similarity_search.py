@@ -3,7 +3,7 @@ import time
 import os.path
 
 from funciones_distancia import *
-from manejo_archivos import cargar_descriptor, listar_archivos_en_carpeta
+from file_functions import cargar_descriptor, listar_archivos_en_carpeta
 from os import listdir, makedirs
 from os.path import isfile, join, exists, abspath
 
@@ -74,7 +74,7 @@ def calcular_frames_minima_distancia(
             # # descriptor_comercial[1] -> Descriptor del frame
 
             distancia_calculada = funcion_distancia(
-                descriptor_frame_tv, descriptor_comercial[1]["vector_caracteristico"])
+                descriptor_frame_tv, descriptor_comercial[1]["feature_vector"])
             if (distancia_calculada < frame_minima_distancia[2]):
                 frame_minima_distancia = (
                     vector_descriptor_comercial[0],  # Nombre del comercial
@@ -102,22 +102,21 @@ def similarity_search(analyzed_video_descriptors_vector, comparate_videos_descri
     for descriptor in enumerate(analyzed_video_descriptors_vector):
         # descriptor[0] -> Numero del frame al que se le esta calculando el ranking
         # descriptor[1] -> Objeto con el vector caracteristico + tiempo transcurrido al que se le calculara el frame del comericial con menor distancia.
-        calculated_min_dist_frame = calcular_frames_minima_distancia(descriptor[1]["vector_caracteristico"], comparate_videos_descriptors, distancia_euclideana, False)
+        calculated_min_dist_frame = calcular_frames_minima_distancia(descriptor[1]["feature_vector"], comparate_videos_descriptors, distancia_euclideana, False)
 
         # result_tuple = ('analyzed_video_frame_number','elapsed_time', 'other_vid_name', 'min_dist_frame')
-        similarity_search_results.append((descriptor[0], descriptor[1]["tiempo_transcurrido"], calculated_min_dist_frame[0], calculated_min_dist_frame[1]))
+        similarity_search_results.append((descriptor[0], descriptor[1]["elapsed_time"], calculated_min_dist_frame[0], calculated_min_dist_frame[1]))
 
         if ((descriptor[0] + 1) % proporcion_aviso) == 0:
             
-            print("Getting min frames distances for the frame",
+            print("Getting min distance frames on the frame",
                   (descriptor[0] + 1),
                   "/",
                   len(analyzed_video_descriptors_vector),
-                  "\t Tiempo tomado:",
+                  "\t Elapsed Time:",
                   diferencia_tiempos(tiempo_inicial, time.time()))
             if (debug):
-                cmd = input(
-                    "Comando? (m -> mostrar distancia calculada, q -> salir, d -> desactivar debug, otro -> omitir)\n")
+                cmd = input("Command? (m -> Show calculated distance, q -> Quit, d -> Disable debugging, l ->Save on log file, * -> Skip)\n")
                 if (cmd == 'm'):
                     import pprint
                     pp = pprint.PrettyPrinter(indent=4)
@@ -126,10 +125,8 @@ def similarity_search(analyzed_video_descriptors_vector, comparate_videos_descri
                     import pprint
                     pp = pprint.PrettyPrinter(indent=4)
                     pprint.pprint(similarity_search_results, open('log.txt', 'w'))
-                elif (cmd == 'q'):
-                    exit()
-                elif(cmd == 'd'):
-                    debug = False
+                elif (cmd == 'q'): exit()
+                elif(cmd == 'd'): debug = False
 
     return np.array(similarity_search_results)
 
