@@ -2,7 +2,7 @@ import numpy as np
 
 from detection import *
 
-def sequence_detector(detected_sequence, min_percentage_sequence_numbers):
+def sequence_detector(detected_sequence, min_percentage_sequence_numbers, min_amount_sequence_numbers):
     """Detects a minimun sequence numbers in a detected sequence.
 
     Arguments:
@@ -12,6 +12,13 @@ def sequence_detector(detected_sequence, min_percentage_sequence_numbers):
     Returns:
         boolean -- Indicates if the are or not a minimum amount of sequence numbers in the detected sequence.
     """
+    # Step 1: Lenght 
+
+    if len(detected_sequence) < min_amount_sequence_numbers:
+        return False
+
+
+    # Step 2: Percentage of sequence numbers:
 
     acc = 0
     sequence_numbers = np.arange(len(detected_sequence))
@@ -21,7 +28,33 @@ def sequence_detector(detected_sequence, min_percentage_sequence_numbers):
         if np.isin(min_dist_frame[1], sequence_numbers) and min_dist_frame[1] not in unique_frames:
             unique_frames.append(min_dist_frame[1])
             acc += 1
+
     return acc / len(detected_sequence) > min_percentage_sequence_numbers
+
+def sequence_cleaner(detected_sequence, max_frame_time_separation):
+    print(detected_sequence)
+    cleaned_sequence = []
+
+    # Time Cleaner
+    current_min_frame = []
+    next_min_frame = []
+    # Comparte the current element and the next
+    for i in range(len(detected_sequence) - 1):
+        current_min_frame = detected_sequence[i]
+        next_min_frame = detected_sequence[i+1]
+        # Calculate the time difference between the current frame and the next
+        if (next_min_frame[0] - current_min_frame[0] <= max_frame_time_separation):
+            cleaned_sequence.append(current_min_frame)
+        else:
+            print (current_min_frame[0],next_min_frame[0],'diff:', next_min_frame[0] - current_min_frame[0],'ok:',next_min_frame[0] - current_min_frame[0] <= max_frame_time_separation )
+
+    return cleaned_sequence
+
+def sequence_cleaner_recursive(detected_sequence, max_frame_time_separation):
+    cleaned_sequence = sequence_cleaner(detected_sequence, max_frame_time_separation)
+    if (detected_sequence == cleaned_sequence):
+        return cleaned_sequence
+    return sequence_cleaner_recursive(cleaned_sequence, max_frame_time_separation)
 
 def extract_time_from_detected_sequence(detected_sequence):
 
@@ -42,7 +75,9 @@ def occurence_detector(
     min_amount_sequence_numbers, 
     min_percentage_sequence_numbers, 
     skip_frames, 
+    max_frame_time_separation,
     debug=True):
+
     # similarity_search_results: Array of tuples
     # result_tuple = ('analyzed_video_frame','elapsed_time', 'other_vid_name', 'min_dist_frame')
     #         (3172, 952584.9666666667, 'scotiabank', 8),
@@ -76,7 +111,7 @@ def occurence_detector(
 
             for other_vid_name in sequences.keys():
                 # if i have a sequence detected, i calculate the time of those and then append it to the detections array
-                if (len(sequences[other_vid_name]) > min_amount_sequence_numbers and sequence_detector(sequences[other_vid_name], min_percentage_sequence_numbers)):
+                if (sequence_detector(sequences[other_vid_name], min_percentage_sequence_numbers, min_amount_sequence_numbers)):
 
                     if (debug):
                         cmd=input('Enter Command:')
@@ -87,7 +122,8 @@ def occurence_detector(
                         elif (cmd == 'q'): exit()
                         elif (cmd == 'd'): debug=False
                     
-                    init_time, end_time = extract_time_from_detected_sequence(sequences[other_vid_name])
+                    # cleaned_sequence = sequence_cleaner_recursive(sequences[other_vid_name], max_frame_time_separation)
+                    init_time, end_time = extract_time_from_detected_sequence(cleaned_sequence)
 
                     if len(detections) == 0:
                         detections.append(detection(other_vid_name, init_time, end_time))

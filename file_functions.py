@@ -12,7 +12,8 @@ def listar_archivos_en_carpeta(ruta, debug=True):
     archivos = [abspath(join(ruta, f))
                 for f in listdir(ruta) if isfile(join(ruta, f))]
     if (debug):
-        print("Archivos encontrados en", ruta, ":\n", archivos, '\n')
+        print("Founded files in", ruta, ":\n", [
+              basename(archivo) for archivo in archivos], '\n')
     return archivos
 
 
@@ -35,7 +36,7 @@ def cargar_descriptores_comerciales(ruta):
     Returns:
         [tuple] -- Retorna la tupla (nombre_vector_caracteristicas_video, descriptor_video)
     """
-    return [(basename(vector_caracteristicas).split('.')[0], cargar_descriptor(vector_caracteristicas)) 
+    return [(basename(vector_caracteristicas).split('.')[0], cargar_descriptor(vector_caracteristicas))
             for vector_caracteristicas in listar_archivos_en_carpeta(ruta)]
 
 
@@ -70,3 +71,20 @@ def save_feature_vector_array(video_path, feature_vector_array):
 
     np.save("temp/" + basename(dirname(video_path)) + '/' + basename(video_path).split(".")
             [0] + ".npy", feature_vector_array)
+
+
+def save_similarity_search_results(analyzed_video_name, similarity_search_result):
+    """Stores similarity search results
+
+    Arguments:
+        analyzed_video_name {String} -- Analyzed video name
+        similarity_search_result {ndarray} -- Arreglo de vectores carcteristicos que sera guardado en la ruta
+    """
+
+    if not exists("temp/similarity_search"):
+        makedirs("temp/similarity_search")
+    print ("Saving results on temp/similarity_search/" + analyzed_video_name )
+    np.save("temp/similarity_search/" + analyzed_video_name, similarity_search_result)
+
+def load_similarity_search_results(filename):
+    return np.load("temp/similarity_search/" + filename)

@@ -10,24 +10,7 @@ from file_functions import save_feature_vector_array, open_video
 # ----------------------------- Feature Vector Extraction -----------------------------
 # ---------------------------------------------------------------------------------------------
 
-
-def calcular_histograma(frame, bins=16):
-    """Calcula el histograma del frame entregado. Retorna un arreglo en donde cada valor esta representado como un subarreglo del padre.
-
-    Arguments:
-        frame {[ndarray]} -- Frame al cual se le calculara el histograma
-
-    Keyword Arguments:
-        bins {int} -- Numero de bins del histograma a calcular (default: {16})
-
-    Returns:
-        [ndarray] -- Arreglo con el histograma
-    """
-
-    return cv2.calcHist([frame], [0], None, [bins], [0, 256])
-
-
-def normalizarVector(v):
+def normalize_vector(v):
     """Normaliza un vector numpy de una dimension y luego lo retorna.
 
     Arguments:
@@ -42,7 +25,7 @@ def normalizarVector(v):
     return v/norm
 
 
-def diferencia_tiempos(start, end):
+def get_time_difference(start, end):
     """Calcula la diferencia de tiempos y la retorna como string formateado
 
     Arguments:
@@ -86,17 +69,18 @@ def histogram_by_parts(frame, rows_of_division, cols_of_division, bins, debug=Fa
 
     for x in range(0, rows_of_division):
         for y in range(0, cols_of_division):
-            # Calculamos el histograma del roi actual:
-            frame_actual = frame[x*roi_height:(x+1) *
+            # Obtains the current ROI:
+            current_frame = frame[x*roi_height:(x+1) *
                                  roi_height, y*roi_width:(y+1)*roi_width]
-            histr = normalizarVector(
-                calcular_histograma(frame_actual, bins=bins))
+            # Calculate the normalized histogram for this ROI
+            histr = normalize_vector(cv2.calcHist([current_frame], [0], None, [16], [0, 256]))
+
             hists_concatenados.append(histr.flatten())
             if debug:
                 histogramas.append(histr)
-                frames.append(frame_actual)
+                frames.append(current_frame)
 
-    # Codigo para debugear e imprimir histogramas
+    # Debug: Print histograms
     if debug:
         cmd = input(
             "Command? (m -> Show frame hists, q -> Quit, d -> Disable debug, * -> Skip)\n")
@@ -135,7 +119,7 @@ def extract_video_feature(
     cols_of_division, 
     bins,
     fps_target=3, 
-    save_feature_vectors = True, 
+    save_results = True, 
     debug=False):
     """
     Extrae los descriptores de los frames del video segun el numero de frames por segundo deseados.
@@ -161,7 +145,7 @@ def extract_video_feature(
 
     # Inicializamos variables
     feature_vector_array = []
-    tiempo_inicio = time.time()
+    start_time = time.time()
 
     print("Starting feature vector extraction for:", os.path.basename(video_path))
 
@@ -179,8 +163,8 @@ def extract_video_feature(
                     "feature_vector": histogram_by_parts(grey_frame, rows_of_division, cols_of_division, bins, debug=debug)
                 })
                
-    print("End of video processing. Elapsed time:", diferencia_tiempos(tiempo_inicio, time.time()), '\n')
+    print("End of video processing. Elapsed time:", get_time_difference(start_time, time.time()), '\n')
 
-    if (save_feature_vectors):
+    if (save_results):
         save_feature_vector_array(video_path, np.array(feature_vector_array))
     return np.array(feature_vector_array) 
