@@ -73,7 +73,7 @@ def histogram_by_parts(frame, rows_of_division, cols_of_division, bins, debug=Fa
             current_frame = frame[x*roi_height:(x+1) *
                                  roi_height, y*roi_width:(y+1)*roi_width]
             # Calculate the normalized histogram for this ROI
-            histr = normalize_vector(cv2.calcHist([current_frame], [0], None, [16], [0, 256]))
+            histr = normalize_vector(cv2.calcHist([current_frame], [0], None, [bins], [0, 256]))
 
             hists_concatenados.append(histr.flatten())
             if debug:
@@ -136,10 +136,7 @@ def extract_video_feature(
 
     video = open_video(video_path)
     total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    # video_detected_fps = int(video.get(cv2.CAP_PROP_FPS))
-    # TODO: delete TEST
-    video_detected_fps = 30
-
+    video_detected_fps = int(video.get(cv2.CAP_PROP_FPS))
     # Indica cuantos frames seran leidos por segundo.
     fps = int(video_detected_fps/fps_target)
 
@@ -155,12 +152,18 @@ def extract_video_feature(
         if i % fps == 0:
             # Transform frame into grayscale 
             grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+
+            # CANNY - TEST -
+            blurred_frame = cv2.blur(grey_frame,(10,10)) 
+            # canny_frame = cv2.Canny(blurred_frame, 10 , 100,)
+
             feature_vector_array.append(
                 {
                     # Timestamp in miliseconds between start of the video and this frame
                     "elapsed_time": video.get(cv2.CAP_PROP_POS_MSEC),
                     # Calculated feature vector
-                    "feature_vector": histogram_by_parts(grey_frame, rows_of_division, cols_of_division, bins, debug=debug)
+                    "feature_vector": histogram_by_parts(blurred_frame, rows_of_division, cols_of_division, bins, debug=debug)
                 })
                
     print("End of video processing. Elapsed time:", get_time_difference(start_time, time.time()), '\n')
@@ -168,3 +171,4 @@ def extract_video_feature(
     if (save_results):
         save_feature_vector_array(video_path, np.array(feature_vector_array))
     return np.array(feature_vector_array) 
+                                                                                                                                                                                                                                                                                                                                                                                                

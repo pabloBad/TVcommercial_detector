@@ -1,21 +1,40 @@
 class detection:
 
-    def __init__(self, detected_video_name, init_time, end_time):
+    def __init__(self, detected_video_name, init_time : int, end_time, init_frame, end_frame):
         self.detected_video_name = detected_video_name
+
         self.init_time = init_time
         self.end_time = end_time
 
-    def is_in_detection(self, init_time, end_time):
-        # Alway gonna have
-        if (self.init_time == init_time or self.end_time == end_time):
-            return True
-        return False
+        self.init_frame = init_frame
+        self.end_frame = end_frame
 
-    def extend_detection(self, init_time, end_time):
-        if self.is_in_detection(init_time, end_time):
-            self.init_time = init_time
-            self.end_time = end_time
+    def is_in_detection(self, detected_video_name, init_time, end_time, init_frame, end_frame):
 
+        return (self.detected_video_name == detected_video_name and 
+                (self.init_time <= init_time and self.init_frame <= init_frame 
+                or self.end_time >= end_time and self.end_frame >= end_frame))
+
+                # and abs(self.init_time - init_time) < diff 
+                # and abs(self.end_time - end_time) < diff)
+
+
+    def extend_detection(self, detected_video_name, init_time, end_time, init_frame, end_frame):
+        if (self.detected_video_name == detected_video_name):
+            # print ("self: ", self.detected_video_name, self.init_time, end_time, self.init_frame, self.end_frame)
+            # print ("new: ", detected_video_name, init_time, end_time, init_frame, end_frame)
+
+            if (self.init_time >= init_time and self.init_frame >= init_frame):
+                self.init_time = init_time
+                self.init_frame = init_frame
+                # print ("mod_init", init_time, init_frame)
+            if (self.end_time <= end_time and self.end_frame <= end_frame):
+                self.end_time = end_time
+                self.end_frame = end_frame
+                # print ("mod_end", end_time, end_frame)
+
+                
+            # print ('\n')
     def get_detection_timestamp(self):
         return self.detected_video_name, self.init_time, self.end_time
 

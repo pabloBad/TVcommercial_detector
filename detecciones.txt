@@ -1,0 +1,9 @@
+mega-2014_04_10	250.2	31.2	mall plaza (2)
+mega-2014_04_10	294.9	1314.1	scotiabank
+mega-2014_04_10	367.9	22.5	vtr
+mega-2014_04_10	641.5	4.2	colgate sensitive
+mega-2014_04_10	2109.6	1084.1	cristal
+mega-2014_04_10	2640.9	21.3	omo1
+mega-2014_04_10	3313.8	17.1	ferreteria mts
+mega-2014_04_10	3308.1	28.5	ferreteria mts
+mega-2014_04_10	3374.8	8.1	dove desodorante hombre

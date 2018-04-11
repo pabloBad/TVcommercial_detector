@@ -86,7 +86,6 @@ def execute_occurence_detector(
     min_amount_sequence_numbers, 
     min_percentage_sequence_numbers, 
     skip_frames, 
-    max_frame_time_separation,
     debug = False):
     occurrences_detected_all_videos = []
 
@@ -104,7 +103,6 @@ def execute_occurence_detector(
                 min_amount_sequence_numbers, 
                 min_percentage_sequence_numbers, 
                 skip_frames,
-                max_frame_time_separation,
                 debug=debug)))
 
     # occurence (analyzed_video_name, (other_video_name, other_video_start_time, other_video_length))
@@ -115,12 +113,19 @@ def execute_occurence_detector(
     for video_analyzed in occurrences_detected_all_videos:
         for occurrences_array in video_analyzed[1]:
             results.append(
-                (video_analyzed[0], occurrences_array[1], occurrences_array[2], occurrences_array[0]))
+                (video_analyzed[0][:-4], occurrences_array[1], occurrences_array[2], occurrences_array[0]))
     return results
+
+def save_results(results):
+    with open('detecciones.txt', 'w') as f:
+        for result in results:
+            string = ''.join([str(result[0]),'\t', str(result[1]),'\t', str(result[2]), '\t', str(result[3]), '\n'])
+            f.write(string)
+
 
 def print_results(results):
     for result in results:
-        print(result[0], '\t', result[1], '\t', result[2], '\t', result[3])
+        print(result[0], '\t', result[1], '\t', result[2], '\t', result[3], '\t')
     return
 
 def main():
@@ -138,46 +143,53 @@ def main():
     # PARAMETERS:
 
     # Feature Extraction
-    ROWS_OF_DIVISION = 8
-    COLS_OF_DIVISION = 8
-    BINS = 16
+    ROWS_OF_DIVISION = 10
+    COLS_OF_DIVISION = 10
+    BINS = 8
     FPS_TARGET = 3
     SAVE_FILES = True
 
     # Similarity Search
 
     # Distance options: manhattan_distance, euclidean_distance, chebychev_distance, hamming_distance, chebychev_distance
-    DISTANCE_FUNCTION = 'manhattan_distance'
+    DISTANCE_FUNCTION = 'euclidean_distance'
     SAVE_FILES_2 = True
 
     # Occurrence Detector
-    WINDOW_SIZE = 200
-    MIN_AMOUNT_SEQUENCE_NUMBERS = 40
-    MIN_PERCENTAGE_SEQUENCE_NUMBERS = 0.4
-    SKIP_FRAMES = 30
-    MAX_FRAME_TIME_SEPARATION = 400 # In miliseconds
+    WINDOW_SIZE = 4 * 50  + 30# 3 FPS * 50 frames  
+    MIN_AMOUNT_SEQUENCE_NUMBERS = 60 # 25 *  3 FPS = 20 Seconds
+    MIN_PERCENTAGE_SEQUENCE_NUMBERS = 0.2
+    # SKIP_FRAMES = 3 * 50 
+    SKIP_FRAMES = round(WINDOW_SIZE*2/3)
+    # MAX_FRAME_DISTANCE_SEPARTION = 5 # Distance between frames of the same detection
 
     # Paso 1: Procesamos todos los videos al generar los vectores de caracteristicas
     # de cada uno de ellos para posteriormente guarlos:
 
     # TODO SACAR ESTE COMENTARIO....
-    # execute_feature_extraction(RUTA_TELEVISION, RUTA_COMERCIALES, ROWS_OF_DIVISION, COLS_OF_DIVISION, BINS, FPS_TARGET, SAVE_FILES, debug=DEBUG)
+    execute_feature_extraction(RUTA_TELEVISION, RUTA_COMERCIALES, ROWS_OF_DIVISION, COLS_OF_DIVISION, BINS, FPS_TARGET, SAVE_FILES, debug=False)
 
     # Paso 2: Hacemos la busqueda por similitud mediante el calculo de un ranking de
     # frames similares entre un frame del video de television y todos los frames de
     # todos los comerciales, usando funciones de distancia de caracteristicas.
-    # execute_similarity_search(TEMPORAL_FEATURE_ANALYZED_VIDEO_PATH, TEMPORAL_FEATURE_OTHER_VIDEO_PATH, DISTANCE_FUNCTION, SAVE_FILES_2, debug = DEBUG)
+    execute_similarity_search(TEMPORAL_FEATURE_ANALYZED_VIDEO_PATH, TEMPORAL_FEATURE_OTHER_VIDEO_PATH, DISTANCE_FUNCTION, SAVE_FILES_2, debug = False)
 
     # Paso 3: Ejecutamos la deteccion de apariciones...
 
-    print_results(execute_occurence_detector(
+    
+
+
+    save_results(execute_occurence_detector(
         [np.load('temp/similarity_search/mega-2014_04_10.npy')],
         WINDOW_SIZE, 
         MIN_AMOUNT_SEQUENCE_NUMBERS,
         MIN_PERCENTAGE_SEQUENCE_NUMBERS,
         SKIP_FRAMES,
-        MAX_FRAME_TIME_SEPARATION,
-        debug=DEBUG))
+        debug=True))
 
+    # print ([np.load('temp/similarity_search/mega-2014_04_10.npy')])
+
+    # from subprocess import call
+    # call(["python", "evaluar_v2.py","detecciones.txt"])
     # print(type(np.load('temp/similarity_search/mega-2014_04_10.npy')))
 main()
