@@ -8,14 +8,16 @@ import cv2
 # ------------------------------------------------------------------------------------------------
 
 
-def listar_archivos_en_carpeta(ruta, debug=True):
-    archivos = [abspath(join(ruta, f))
-                for f in listdir(ruta) if isfile(join(ruta, f))]
+def list_files_in_folder(path, debug=True, return_basenames=False):
+    files = [abspath(join(path, f))
+                for f in listdir(path) if isfile(join(path, f))]
     if (debug):
-        print("Founded files in", ruta, ":\n", [
-              basename(archivo) for archivo in archivos], '\n')
-    return archivos
+        print("Founded files in", path, ":\n", [
+              basename(file_name) for file_name in files], '\n')
+    if (return_basenames):
+        return [basename(file_name) for file_name in files]
 
+    return files
 
 def cargar_descriptor(ruta):
     if (exists(ruta)):
@@ -37,7 +39,7 @@ def cargar_descriptores_comerciales(ruta):
         [tuple] -- Retorna la tupla (nombre_vector_caracteristicas_video, descriptor_video)
     """
     return [(basename(vector_caracteristicas).split('.')[0], cargar_descriptor(vector_caracteristicas))
-            for vector_caracteristicas in listar_archivos_en_carpeta(ruta)]
+            for vector_caracteristicas in list_files_in_folder(ruta)]
 
 
 def open_video(path):
@@ -54,7 +56,8 @@ def open_video(path):
     """
 
     if (not isfile(path)):
-        raise Exception("Archivo no encontrado: " + path)
+        msg = "File not found: " + path
+        raise Exception(msg)
     return cv2.VideoCapture(path)
 
 
@@ -83,8 +86,9 @@ def save_similarity_search_results(analyzed_video_name, similarity_search_result
 
     if not exists("temp/similarity_search"):
         makedirs("temp/similarity_search")
-    print ("Saving results on temp/similarity_search/" + analyzed_video_name )
-    np.save("temp/similarity_search/" + analyzed_video_name, similarity_search_result)
+    print("Saving results on temp/similarity_search/" + analyzed_video_name)
+    np.save("temp/similarity_search/" +
+            analyzed_video_name, similarity_search_result)
 
 def load_similarity_search_results(filename):
     return np.load("temp/similarity_search/" + filename)

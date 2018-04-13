@@ -3,10 +3,6 @@ import time
 import os.path
 
 from distance_functions import *
-from file_functions import cargar_descriptor, listar_archivos_en_carpeta, save_similarity_search_results
-from os import listdir, makedirs
-from os.path import isfile, join, exists, abspath
-
 
 distance_functions_dict = {
         'manhattan_distance' : manhattan_distance,
@@ -41,10 +37,10 @@ def calculate_min_distance_frames(
         distance_function,
         debug=False):
 
-    frame_minima_distancia = (None, None, np.finfo(
+    frame_min_distance = (None, None, np.finfo(
         float).max)  # Inicializamos la variable
 
-    # Iteramos por cada uno de los comerciales:
+    # Iterates over each other video:
     for vector_descriptor_comercial in vectores_descriptores_comerciales:
         # vector_descriptor_comercial[0] -> Nombre del comercial.
         # vector_descriptor_comercial[1] -> Arreglo con los descriptores de cada frame.
@@ -55,16 +51,15 @@ def calculate_min_distance_frames(
 
             distancia_calculada = distance_function(
                 descriptor_frame_tv, descriptor_comercial[1]["feature_vector"])
-            if (distancia_calculada < frame_minima_distancia[2]):
-                frame_minima_distancia = (
+            if (distancia_calculada < frame_min_distance[2]):
+                frame_min_distance = (
                     vector_descriptor_comercial[0],  # Nombre del comercial
                     descriptor_comercial[0],        # Frame del comercial.
                     distancia_calculada)            # Distancia calculada
 
-        # Extraigo los primeros n resultados del ranking y retorno
 
-    # Retornamos solo el comercial y el numero del frame
-    return (frame_minima_distancia[0], frame_minima_distancia[1])
+    # Return (other_vid_name, min_frame_distance)
+    return (frame_min_distance[0], frame_min_distance[1])
 
 
 def similarity_search(
@@ -93,14 +88,14 @@ def similarity_search(
 
     initial_time = time.time()
     for descriptor in enumerate(analyzed_video_descriptors_vector):
-        # descriptor[0] -> Numero del frame al que se le esta calculando el ranking
-        # descriptor[1] -> Objeto con el vector caracteristico + tiempo transcurrido al que se le calculara el frame del comericial con menor distancia.
+        # descriptor[0] -> Frame which is calculating the min distance with all other_videos frames
+        # descriptor[1] -> Object with tuples of the caracteristic vector of each other video
         calculated_min_dist_frame = calculate_min_distance_frames(descriptor[1]["feature_vector"], comparate_videos_descriptors, distance_function, False)
 
         # result_tuple = ('analyzed_video_frame_number','elapsed_time', 'other_vid_name', 'min_dist_frame')
         similarity_search_results.append((descriptor[0], descriptor[1]["elapsed_time"], calculated_min_dist_frame[0], calculated_min_dist_frame[1]))
 
-        # Print Status
+        # Print status:
         if ((descriptor[0] + 1) % status_proportion) == 0:
             print("Getting min distance frames on the frame",
                   (descriptor[0] + 1),"/",

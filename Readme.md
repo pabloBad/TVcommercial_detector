@@ -1,16 +1,22 @@
-# TVcommercial_detector
+# Tarea 1 MIR
 
-### Instructions to install:
+### Requisitos para ejecutar el programa:
+- Python 3.6 
+- OpenCV3 
 
-If you're not using some Anaconda Distribution, 
+##### Si se requiere instalar:
 
-- Install python 3.6
-- Install using pip numpy, matplotlib, cv2
-- run tc_commercial_detector.py on console
+Python: descargar desde https://www.python.org/
+OpenCV: una vez descargado python y agregado al path, ejecutar: pip install opencv-python
 
-### How to use
+### Pasos para ejecutar el programa:
 
-- Copy tv videos on videos/television directory
-- Copy commercial videos on videos/commercial directory
-- Execute tc_commercial_detector.py (still in progress...)
+1. Copiar todos los videos de televisión (los videos largos) en la carpeta videos/television, dentro del directiorio raiz del proyecto
+2. Copiar todos los videos de comerciales (videos cortos) en la carpeta videos/comerciales
+Observación: por favor, copiar solo videos, ningún otro archivo a esta carpeta
+3. Ejecutar en una consola 
+    python tv_commercial_detector.py
+4. Esperar a que los videos se procesen. 
+5. Al final del procesamiento, se guardaran los resultados de la ejecución en el archivo detecciones.txt según el formato del enunciado.
+6. Además, se ejecutará automáticamente el script evaluar_v2.py al final y entregará el resultado de la detección.
 

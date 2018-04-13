@@ -100,7 +100,7 @@ def histogram_by_parts(frame, rows_of_division, cols_of_division, bins, debug=Fa
                 plt.plot(enum_hists[1])
             plt.show()
             map(print, frames)
-            print("Histogramas Concatenados\n", np.array(
+            print("Concatenated histograms value\n", np.array(
                 hists_concatenados, dtype="float").flatten())
 
         elif (cmd == 'q'): exit()
@@ -150,13 +150,9 @@ def extract_video_feature(
         ret, frame = video.read()
         # Skip no relevant frames (3 frames per second)
         if i % fps == 0:
-            # Transform frame into grayscale 
+            # Transform frame into grayscale and then, blurry
             grey_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-
-            # CANNY - TEST -
             blurred_frame = cv2.blur(grey_frame,(10,10)) 
-            # canny_frame = cv2.Canny(blurred_frame, 10 , 100,)
 
             feature_vector_array.append(
                 {
@@ -171,4 +167,3 @@ def extract_video_feature(
     if (save_results):
         save_feature_vector_array(video_path, np.array(feature_vector_array))
     return np.array(feature_vector_array) 
-                                                                                                                                                                                                                                                                                                                                                                                                

@@ -1,9 +1,53 @@
-mega-2014_04_10	250.2	31.2	mall plaza (2)
-mega-2014_04_10	294.9	1314.1	scotiabank
-mega-2014_04_10	367.9	22.5	vtr
-mega-2014_04_10	641.5	4.2	colgate sensitive
-mega-2014_04_10	2109.6	1084.1	cristal
-mega-2014_04_10	2640.9	21.3	omo1
-mega-2014_04_10	3313.8	17.1	ferreteria mts
-mega-2014_04_10	3308.1	28.5	ferreteria mts
-mega-2014_04_10	3374.8	8.1	dove desodorante hombre
+mega-2014_04_10	250.2	30.931	mall plaza (2)
+mega-2014_04_10	296.7	25.225	scotiabank
+mega-2014_04_10	367.9	31.231	vtr
+mega-2014_04_10	434.6	15.616	falabella connect
+mega-2014_04_10	949.6	25.526	scotiabank
+mega-2014_04_10	1475.4	24.625	scotiabank
+mega-2014_04_10	1584.4	24.324	scotiabank
+mega-2014_04_10	2105.7	34.835	cristal
+mega-2014_04_10	2640.9	21.021	omo1
+mega-2014_04_10	3162.5	30.931	cristal
+mega-2014_04_10	3305.1	31.231	ferreteria mts
+mega-2014_04_10	3337.0	15.616	falabella connect
+mega-2014_04_10	3353.2	18.619	dove desodorante hombre
+mega-2014_04_11	110.8	30.03	dfm motor
+mega-2014_04_11	157.4	19.52	pantene expert
+mega-2014_04_11	192.5	30.931	vtr
+mega-2014_04_11	237.0	26.727	scotiabank
+mega-2014_04_11	485.3	24.324	scotiabank
+mega-2014_04_11	576.6	15.616	falabella connect
+mega-2014_04_11	619.0	23.123	mall plaza (2)
+mega-2014_04_11	872.4	30.33	samsung
+mega-2014_04_11	1004.8	26.727	scotiabank
+mega-2014_04_11	1254.1	31.231	ferreteria mts
+mega-2014_04_11	1409.6	31.231	vtr
+mega-2014_04_11	1662.5	31.231	vtr
+mega-2014_04_11	1710.5	31.231	ferreteria mts
+mega-2014_04_11	1778.7	30.931	cristal
+mega-2014_04_11	2032.5	30.931	limon soda
+mega-2014_04_11	2064.0	15.616	falabella connect
+mega-2014_04_11	2080.2	30.931	cristal
+mega-2014_04_11	2310.2	30.33	samsung
+mega-2014_04_11	2432.5	30.931	mall plaza (2)
+mega-2014_04_11	2685.6	31.231	limon soda
+mega-2014_04_11	2794.3	19.219	pantene expert
+mega-2014_04_11	2935.2	30.931	mall plaza (2)
+mega-2014_04_11	2982.6	30.33	samsung
+mega-2014_04_11	3265.8	34.535	vtr
+mega-2014_04_11	3325.9	30.931	cristal
+mega-2014_04_11	3464.9	30.931	limon soda
+mega-2014_04_11	3496.7	30.03	dove pelo
+mega-2014_04_16	350.2	30.931	soprole panacota
+mega-2014_04_16	402.1	29.429	colgate total12
+mega-2014_04_16	432.2	20.42	mall plaza
+mega-2014_04_16	1152.9	31.231	mr big (2)
+mega-2014_04_16	1252.0	33.033	ballerina
+mega-2014_04_16	1356.5	20.42	mall plaza
+mega-2014_04_16	1413.8	39.64	soprole panacota
+mega-2014_04_16	2183.8	30.03	colgate sensitive
+mega-2014_04_16	2316.2	29.73	colgate sensitive
+mega-2014_04_16	2346.9	20.721	omo1
+mega-2014_04_16	2417.1	27.628	dove pelo
+mega-2014_04_16	3145.4	23.423	mall plaza
+mega-2014_04_16	3232.8	24.625	scotiabank
